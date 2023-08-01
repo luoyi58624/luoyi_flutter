@@ -1,0 +1,28 @@
+name: build web
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.10.0'
+          channel: 'stable'
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
+          architecture: x64
+      - run: |
+          flutter pub get
+          flutter build apk --release
+      - name: Release apk
+        uses: ncipollo/release-action@v1.5.0
+        with:
+          artifacts: "build/app/outputs/apk/release/*.apk"
