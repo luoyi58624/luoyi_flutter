@@ -22,17 +22,22 @@ jobs:
       - run: |
           flutter pub get
           flutter build apk --release --target-platform=android-arm64
-#      - uses: actions/upload-artifact@v3
-#        with:
-#          name: flutter_apk
-#          path: build\app\outputs\flutter-apk\app-release.apk
+      - uses: actions/upload-artifact@v3
+        with:
+          name: flutter_apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+      - uses: actions/download-artifact@v3
+        with:
+          name: flutter_apk
+      - name: Display structure of downloaded files
+        run: ls -R
       - name: Upload File
         id: myRequest
         uses: fjogeleit/http-request-action@v1
         with:
           url: 'http://115.159.28.38:10008/other/upload'
           method: 'POST'
-          file: build\app\outputs\flutter-apk\app-release.apk
+          file: ./app-release.apk
       - name: Show Response
         run: |
           echo ${{ steps.myRequest.outputs.response }}
