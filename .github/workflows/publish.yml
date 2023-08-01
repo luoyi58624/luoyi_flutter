@@ -2,8 +2,12 @@ name: build web
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - master
+#on:
+#  push:
+#    tags:
+#      - 'v*.*.*'
 
 jobs:
   build:
