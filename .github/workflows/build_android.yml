@@ -2,8 +2,8 @@
 #
 #on:
 #  push:
-#    branches:
-#      - master
+#    tags:
+#      - 'v*.*.*'
 #
 #jobs:
 #  build:
@@ -43,4 +43,4 @@
 #          echo ${{ steps.myRequest.outputs.response }}
 #          echo ${{ steps.myRequest.outputs.headers }}
 #          echo ${{ fromJson(steps.myRequest.outputs.response).data }}
-
+#
