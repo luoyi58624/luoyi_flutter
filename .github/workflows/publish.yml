@@ -26,3 +26,4 @@ jobs:
         uses: ncipollo/release-action@v1.5.0
         with:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+          token: ${{ secrets.github_token }}
