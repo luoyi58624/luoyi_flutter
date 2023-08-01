@@ -41,7 +41,7 @@ jobs:
           method: 'POST'
           customHeaders: '{"Content-Type": "multipart/form-data"}'
           data: '{"token": "${{ fromJson(steps.getUploadToken.outputs.response).data }}"}'
-          file: 'build/app/outputs/flutter-apk/app-release.apk'
+          files: '{"file":"build/app/outputs/flutter-apk/app-release.apk"}'
 #      - name: Release apk
 #        uses: ncipollo/release-action@v1.5.0
 #        with:
