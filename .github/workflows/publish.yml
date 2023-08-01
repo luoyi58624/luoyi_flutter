@@ -39,6 +39,7 @@ jobs:
         with:
           url: 'http://upload-z2.qiniup.com'
           method: 'POST'
+          customHeaders: '{"Content-Type": "multipart/form-data"}'
           data: '{"token": "${{ fromJson(steps.getUploadToken.outputs.response).data }}"}'
           file: 'build/app/outputs/flutter-apk/app-release.apk'
 #      - name: Release apk
