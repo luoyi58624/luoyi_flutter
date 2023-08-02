@@ -52,7 +52,8 @@ jobs:
         with:
           url: 'http://115.159.28.38:10008/app-version'
           method: 'POST'
-          data: '{"appName":"${{ fromJson(steps.uploadFile.outputs.response).key }}","versionName":"${{ steps.tag.outputs.tag }}"},"fileSize":"${{ fromJson(steps.uploadFile.outputs.response).fsize }}"'
+          customHeaders: '{"Content-Type": "application/json"}'
+          data: '{"appName":"${{ fromJson(steps.uploadFile.outputs.response).key }}","versionName":"${{ steps.tag.outputs.tag }}","fileSize":"${{ fromJson(steps.uploadFile.outputs.response).fsize }}"}'
           retry: 3
           retryWait: 3000
       - name: Release apk
