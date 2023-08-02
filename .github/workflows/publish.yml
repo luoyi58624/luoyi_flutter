@@ -1,19 +1,25 @@
-name: build web
+name: publish android
 
-on:
-  push:
-    branches:
-      - master
 #on:
 #  push:
-#    tags:
-#      - 'v*.*.*'
+#    branches:
+#      - master
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+env:
+  NAME: luoyi_flutter
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
@@ -26,13 +32,12 @@ jobs:
         id: getUploadToken
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'http://115.159.28.38:10008/getUploadToken?fileName=luoyi_flutter.apk'
+          url: 'http://115.159.28.38:10008/getUploadToken?fileName=${{ env.NAME }}_${{ steps.tag.outputs.tag }}.apk'
           method: 'GET'
       - name: Echo Response Token
         run: |
           echo ${{ steps.getUploadToken.outputs.response }}
           echo ${{ fromJson(steps.getUploadToken.outputs.response) }}
-          echo ${{ fromJson(steps.getUploadToken.outputs.response).data }}
       - name: Upload File
         id: myRequest
         uses: fjogeleit/http-request-action@v1
@@ -40,7 +45,7 @@ jobs:
           url: 'http://upload-z2.qiniup.com'
           method: 'POST'
           customHeaders: '{"Content-Type": "multipart/form-data"}'
-          data: '{"token":"${{ fromJson(steps.getUploadToken.outputs.response).data }}","key":"luoyi_flutter.apk"}'
+          data: '{"token":"${{ fromJson(steps.getUploadToken.outputs.response).data }}","key":"${{ env.NAME }}_${{ steps.tag.outputs.tag }}.apk"}'
           files: '{"file":"build/app/outputs/flutter-apk/app-release.apk"}'
 #      - name: Release apk
 #        uses: ncipollo/release-action@v1.5.0
