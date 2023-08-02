@@ -1,9 +1,5 @@
 name: publish android
 
-#on:
-#  push:
-#    branches:
-#      - master
 on:
   push:
     tags:
@@ -39,7 +35,7 @@ jobs:
           echo ${{ steps.getUploadToken.outputs.response }}
           echo ${{ fromJson(steps.getUploadToken.outputs.response) }}
       - name: Upload File
-        id: myRequest
+        id: uploadFile
         uses: fjogeleit/http-request-action@v1
         with:
           url: 'http://upload-z2.qiniup.com'
@@ -47,8 +43,20 @@ jobs:
           customHeaders: '{"Content-Type": "multipart/form-data"}'
           data: '{"token":"${{ fromJson(steps.getUploadToken.outputs.response).data }}","key":"${{ env.NAME }}_${{ steps.tag.outputs.tag }}.apk"}'
           files: '{"file":"build/app/outputs/flutter-apk/app-release.apk"}'
-#      - name: Release apk
-#        uses: ncipollo/release-action@v1.5.0
-#        with:
-#          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
-#          token: ${{ secrets.github_token }}
+          timeout: 30000
+          retry: 3
+          retryWait: 3000
+      - name: Insert Upload Data
+        id: insertUploadData
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'http://115.159.28.38:10008/app-version'
+          method: 'POST'
+          data: '{"appName":"${{ fromJson(steps.uploadFile.outputs.response).key }}","versionName":"${{ steps.tag.outputs.tag }}"},"fileSize":"${{ fromJson(steps.uploadFile.outputs.response).fsize }}"'
+          retry: 3
+          retryWait: 3000
+      - name: Release apk
+        uses: ncipollo/release-action@v1.5.0
+        with:
+          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+          token: ${{ secrets.github_token }}
