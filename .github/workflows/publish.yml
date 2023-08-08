@@ -20,7 +20,7 @@ jobs:
           flutter-version: '3.10.0'
           channel: 'stable'
       - run: flutter pub get
-      - run: echo $ENCODED_KEYSTORE | base64 -di > android/app/keystore.jks
+      - run: echo $ENCODED_KEYSTORE | base64 -di > android/app/flutter_app.jks
         env:
           ENCODED_KEYSTORE: ${{ secrets.ENCODED_KEYSTORE }}
       - run: flutter build apk --release --target-platform=android-arm64
