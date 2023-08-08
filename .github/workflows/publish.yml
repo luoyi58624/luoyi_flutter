@@ -19,31 +19,37 @@ jobs:
         with:
           flutter-version: '3.10.0'
           channel: 'stable'
-      - run: |
-          flutter pub get
-          flutter build apk --release --target-platform=android-arm64
-      - name: Get Upload Token
-        id: getUploadToken
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: 'http://115.159.28.38:10008/getUploadToken?fileName=luoyi_flutter.apk'
-          method: 'GET'
-      - name: Echo Response Token
-        run: |
-          echo ${{ steps.getUploadToken.outputs.response }}
-          echo ${{ fromJson(steps.getUploadToken.outputs.response) }}
-          echo ${{ fromJson(steps.getUploadToken.outputs.response).data }}
-      - name: Upload File
-        id: myRequest
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: 'http://upload-z2.qiniup.com'
-          method: 'POST'
-          customHeaders: '{"Content-Type": "multipart/form-data"}'
-          data: '{"token":"${{ fromJson(steps.getUploadToken.outputs.response).data }}","key":"luoyi_flutter.apk"}'
-          files: '{"file":"build/app/outputs/flutter-apk/app-release.apk"}'
-#      - name: Release apk
-#        uses: ncipollo/release-action@v1.5.0
+      - run: flutter pub get
+      - run: echo $ENCODED_KEYSTORE | base64 -di > android/app/keystore.jks
+        env:
+          ENCODED_KEYSTORE: ${{ secrets.ENCODED_KEYSTORE }}
+      - run: flutter build apk --release --target-platform=android-arm64
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
+#      - name: Get Upload Token
+#        id: getUploadToken
+#        uses: fjogeleit/http-request-action@v1
 #        with:
-#          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
-#          token: ${{ secrets.github_token }}
+#          url: 'http://115.159.28.38:10008/getUploadToken?fileName=luoyi_flutter.apk'
+#          method: 'GET'
+#      - name: Echo Response Token
+#        run: |
+#          echo ${{ steps.getUploadToken.outputs.response }}
+#          echo ${{ fromJson(steps.getUploadToken.outputs.response) }}
+#          echo ${{ fromJson(steps.getUploadToken.outputs.response).data }}
+#      - name: Upload File
+#        id: myRequest
+#        uses: fjogeleit/http-request-action@v1
+#        with:
+#          url: 'http://upload-z2.qiniup.com'
+#          method: 'POST'
+#          customHeaders: '{"Content-Type": "multipart/form-data"}'
+#          data: '{"token":"${{ fromJson(steps.getUploadToken.outputs.response).data }}","key":"luoyi_flutter.apk"}'
+#          files: '{"file":"build/app/outputs/flutter-apk/app-release.apk"}'
+      - name: Release apk
+        uses: ncipollo/release-action@v1.5.0
+        with:
+          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+          token: ${{ secrets.github_token }}
